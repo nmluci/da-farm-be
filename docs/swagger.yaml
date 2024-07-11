@@ -1,4 +1,50 @@
 basePath: /api/v1
+definitions:
+  farms.FarmResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Farm A
+        type: string
+    type: object
+  farms.ListFarmResponse:
+    properties:
+      farms:
+        items:
+          $ref: '#/definitions/farms.FarmResponse'
+        type: array
+      meta:
+        $ref: '#/definitions/httpres.ListPagination'
+    type: object
+  httpres.BaseResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/httpres.ErrorResponse'
+    type: object
+  httpres.ErrorResponse:
+    properties:
+      code:
+        example: 404001
+        type: integer
+      msg:
+        example: unknown
+        type: string
+    type: object
+  httpres.ListPagination:
+    properties:
+      limit:
+        example: 100
+        type: integer
+      page:
+        example: 1
+        type: integer
+      total_page:
+        example: 10
+        type: integer
+    type: object
 info:
   contact: {}
   description: Simple API to manage Farms and Ponds
@@ -6,6 +52,43 @@ info:
   title: DA Farm Backend
   version: "1.0"
 paths:
+  /farms:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpres.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/farms.ListFarmResponse'
+                error:
+                  type: string
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpres.BaseResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/httpres.ErrorResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/httpres.BaseResponse'
+            - properties:
+                error:
+                  $ref: '#/definitions/httpres.ErrorResponse'
+              type: object
+      summary: get all farm
+      tags:
+      - Farm
   /misc/ping:
     get:
       produces:

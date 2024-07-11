@@ -10,18 +10,16 @@ type PingService interface {
 	Ping(context.Context) string
 }
 
-type pingService struct {
-	logger zerolog.Logger
+type pingService struct{}
+
+func NewService() PingService {
+	return &pingService{}
 }
 
-func NewService(logger zerolog.Logger) PingService {
-	return &pingService{
-		logger: logger,
-	}
-}
+func (svc *pingService) Ping(ctx context.Context) string {
+	logger := zerolog.Ctx(ctx)
 
-func (svc *pingService) Ping(_ context.Context) string {
-	svc.logger.Info().Msg("ping recv'd")
+	logger.Info().Msg("ping recv'd")
 
 	return "hello world"
 }

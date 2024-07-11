@@ -4,7 +4,6 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/nmluci/da-farm-be/docs"
-	_ "github.com/nmluci/da-farm-be/docs"
 	"github.com/nmluci/da-farm-be/internal/config"
 	"github.com/nmluci/da-farm-be/internal/database/postgres"
 	"github.com/nmluci/da-farm-be/internal/domain"

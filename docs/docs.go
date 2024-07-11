@@ -16,6 +16,76 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/farms": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Farm"
+                ],
+                "summary": "get all farm",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/httpres.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/farms.ListFarmResponse"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/httpres.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/definitions/httpres.ErrorResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/httpres.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/definitions/httpres.ErrorResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/misc/ping": {
             "get": {
                 "produces": [
@@ -29,6 +99,74 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "farms.FarmResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Farm A"
+                }
+            }
+        },
+        "farms.ListFarmResponse": {
+            "type": "object",
+            "properties": {
+                "farms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/farms.FarmResponse"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/httpres.ListPagination"
+                }
+            }
+        },
+        "httpres.BaseResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/httpres.ErrorResponse"
+                }
+            }
+        },
+        "httpres.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 404001
+                },
+                "msg": {
+                    "type": "string",
+                    "example": "unknown"
+                }
+            }
+        },
+        "httpres.ListPagination": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "total_page": {
+                    "type": "integer",
+                    "example": 10
                 }
             }
         }

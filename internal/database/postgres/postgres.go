@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 
+	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -24,32 +25,32 @@ func New(logger zerolog.Logger, conf *PostgresConfig) (db *sqlx.DB, err error) {
 
 	logger.Info().Msg("db init successfully")
 
-	// dbMigrate, err := migrate.New("file://migrations", datasource)
-	// if err != nil {
-	// 	logger.Error().Err(err).Msg("failed to connect to migration engine")
-	// 	return
-	// }
+	dbMigrate, err := migrate.New("file://migrations", datasource)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to connect to migration engine")
+		return
+	}
 
-	// if err = dbMigrate.Up(); err != nil && err != migrate.ErrNoChange {
-	// 	logger.Error().Err(err).Msg("failed to perform migrations")
-	// 	return
-	// }
+	if err = dbMigrate.Up(); err != nil && err != migrate.ErrNoChange {
+		logger.Error().Err(err).Msg("failed to perform migrations")
+		return
+	}
 
-	// rev, isDirty, err := dbMigrate.Version()
-	// if err != nil && err != migrate.ErrNilVersion {
-	// 	logger.Error().Err(err).Msg("failed to fetch migration version")
-	// 	return
-	// }
+	rev, isDirty, err := dbMigrate.Version()
+	if err != nil && err != migrate.ErrNilVersion {
+		logger.Error().Err(err).Msg("failed to fetch migration version")
+		return
+	}
 
-	// if isDirty {
-	// 	logger.Warn().Msg("db migration is dirty")
-	// }
+	if isDirty {
+		logger.Warn().Msg("db migration is dirty")
+	}
 
-	// if err == migrate.ErrNilVersion {
-	// 	logger.Info().Msg("db migration Version: None")
-	// } else {
-	// 	logger.Info().Msgf("db migration Version: %d", rev)
-	// }
+	if err == migrate.ErrNilVersion {
+		logger.Info().Msg("db migration Version: None")
+	} else {
+		logger.Info().Msgf("db migration Version: %d", rev)
+	}
 
 	return
 }
