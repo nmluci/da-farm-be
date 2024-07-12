@@ -37,6 +37,7 @@ const (
 const (
 	ErrStatusUnknown        = http.StatusInternalServerError
 	ErrStatusClient         = http.StatusBadRequest
+	ErrStatusConflict       = http.StatusConflict
 	ErrStatusNotLoggedIn    = http.StatusUnauthorized
 	ErrStatusNoAccess       = http.StatusForbidden
 	ErrStatusReqBody        = http.StatusUnprocessableEntity
@@ -47,7 +48,7 @@ const (
 var errorMap = map[error]httpres.ErrorResponse{
 	ErrUnknown:                  errorResponse(ErrStatusUnknown, ErrCodeUndefined, ErrUnknown),
 	ErrBadRequest:               errorResponse(ErrStatusClient, ErrCodeBadRequest, ErrBadRequest),
-	ErrDuplicatedResources:      errorResponse(ErrStatusClient, ErrCodeDuplicatedResources, ErrDuplicatedResources),
+	ErrDuplicatedResources:      errorResponse(ErrStatusConflict, ErrCodeDuplicatedResources, ErrDuplicatedResources),
 	ErrBrokenUserReq:            errorResponse(ErrStatusReqBody, ErrCodeBrokenUserReq, ErrBrokenUserReq),
 	ErrNotFound:                 errorResponse(ErrStatusNotFound, ErrCodeNotFound, ErrNotFound),
 	ErrMissingRequiredAttribute: errorResponse(ErrStatusClient, ErrCodeMissingRequiredAttribute, ErrMissingRequiredAttribute),

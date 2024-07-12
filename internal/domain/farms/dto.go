@@ -12,6 +12,7 @@ type FarmRequestQuery struct {
 
 // FarmPayload represent payload fetch from request
 type FarmPayload struct {
+	ID   int64  `param:"farmID" example:"1" json:"-"` // ignore any value assigned via JSON body
 	Name string `json:"name" example:"Farm A"`
 }
 

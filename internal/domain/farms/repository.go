@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -41,10 +42,12 @@ type farmQuery struct {
 	Limit, Page uint64
 }
 
+var pgSquirrel = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+
 func (repo *farmRepository) GetAll(ctx context.Context, params *farmQuery) (res []*FarmType, err error) {
 	logger := zerolog.Ctx(ctx)
 
-	stmt, args, _ := squirrel.Select("id", "name").From("farms").
+	stmt, args, _ := pgSquirrel.Select("id", "name").From("farms").
 		Where(squirrel.And{
 			squirrel.Eq{"deleted_at": nil},
 		}).
@@ -75,7 +78,7 @@ func (repo *farmRepository) GetAll(ctx context.Context, params *farmQuery) (res 
 func (repo *farmRepository) Count(ctx context.Context, params *farmQuery) (res uint64, err error) {
 	logger := zerolog.Ctx(ctx)
 
-	stmt, args, _ := squirrel.Select("count(*)").From("farms").
+	stmt, args, _ := pgSquirrel.Select("count(*)").From("farms").
 		Where(squirrel.And{
 			squirrel.Eq{"deleted_at": nil},
 		}).
@@ -96,14 +99,14 @@ func (repo *farmRepository) Count(ctx context.Context, params *farmQuery) (res u
 func (repo *farmRepository) GetOne(ctx context.Context, params *farmQuery) (res *FarmType, err error) {
 	logger := zerolog.Ctx(ctx)
 
-	stmt, args, _ := squirrel.Select("id", "name").From("farms").
+	stmt, args, _ := pgSquirrel.Select("id", "name").From("farms").
 		Where(squirrel.And{
 			squirrel.Eq{"id": params.ID},
 			squirrel.Eq{"deleted_at": nil},
 		}).ToSql()
 
 	res = &FarmType{}
-	err = repo.db.QueryRowxContext(ctx, stmt, args).StructScan(res)
+	err = repo.db.QueryRowxContext(ctx, stmt, args...).StructScan(res)
 	if err != nil && err != sql.ErrNoRows {
 		logger.Error().Err(err).Msg("failed to fetch data")
 		return
@@ -117,7 +120,7 @@ func (repo *farmRepository) GetOne(ctx context.Context, params *farmQuery) (res 
 func (repo *farmRepository) Store(ctx context.Context, payload *FarmType) (err error) {
 	logger := zerolog.Ctx(ctx)
 
-	stmt, args, _ := squirrel.Insert("farms").
+	stmt, args, _ := pgSquirrel.Insert("farms").
 		Columns("name").
 		Values(payload.Name).ToSql()
 
@@ -142,9 +145,7 @@ func (repo *farmRepository) Store(ctx context.Context, payload *FarmType) (err e
 func (repo *farmRepository) Upsert(ctx context.Context, payload *FarmType) (err error) {
 	logger := zerolog.Ctx(ctx)
 
-	tx, err := repo.db.BeginTxx(ctx, &sql.TxOptions{
-		ReadOnly: true,
-	})
+	tx, err := repo.db.BeginTxx(ctx, nil)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to initialize a transaction")
 		return
@@ -155,26 +156,28 @@ func (repo *farmRepository) Upsert(ctx context.Context, payload *FarmType) (err 
 	var args []any
 
 	// check for row
-	stmt, args, _ = squirrel.Select("count(*)").From("farms").Where(squirrel.And{
+	stmt, args, _ = pgSquirrel.Select("count(*)").From("farms").Where(squirrel.And{
 		squirrel.Eq{"id": payload.ID},
 		squirrel.Eq{"deleted_at": nil},
 	}).ToSql()
 
 	var count int64
-	if err = repo.db.QueryRowxContext(ctx, stmt, args...).Scan(&count); err != nil {
+	if err = repo.db.QueryRowxContext(ctx, stmt, args...).Scan(&count); err != nil && err != sql.ErrNoRows { // make sure it's not an err from non-existing result
 		logger.Error().Err(err).Msg("failed to fetch data")
 		return
 	}
 
 	switch count {
 	case 0:
-		stmt, args, _ = squirrel.Insert("farms").Columns("name").Values(payload.Name).ToSql()
-	case 1:
-		stmt, args, _ = squirrel.Update("farms").SetMap(map[string]interface{}{
+		stmt, args, _ = pgSquirrel.Insert("farms").Columns("name").Values(payload.Name).ToSql()
+	default:
+		stmt, args, _ = pgSquirrel.Update("farms").SetMap(map[string]interface{}{
 			"name":       payload.Name,
 			"updated_at": time.Now(),
 		}).Where(squirrel.Eq{"id": payload.ID}).ToSql()
 	}
+
+	fmt.Println(stmt, args)
 
 	_, err = tx.ExecContext(ctx, stmt, args...)
 	if err != nil {
@@ -201,7 +204,35 @@ func (repo *farmRepository) Upsert(ctx context.Context, payload *FarmType) (err 
 func (repo *farmRepository) Delete(ctx context.Context, payload *farmQuery) (err error) {
 	logger := zerolog.Ctx(ctx)
 
-	stmt, args, _ := squirrel.Update("farms").SetMap(map[string]interface{}{
+	tx, err := repo.db.BeginTxx(ctx, nil)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to initialize a transaction")
+		return
+	}
+	defer tx.Rollback()
+
+	var stmt string
+	var args []any
+
+	// check for row existence
+	stmt, args, _ = pgSquirrel.Select("count(*)").From("farms").Where(squirrel.And{
+		squirrel.Eq{"id": payload.ID},
+		squirrel.Eq{"deleted_at": nil},
+	}).ToSql()
+
+	var count int64
+	if err = repo.db.QueryRowxContext(ctx, stmt, args...).Scan(&count); err != nil && err != sql.ErrNoRows {
+		logger.Error().Err(err).Msg("failed to fetch data")
+		return
+	}
+
+	if count == 0 {
+		err = errs.ErrNotFound
+		logger.Error().Err(err).Msg("farm doesn't exists")
+		return
+	}
+
+	stmt, args, _ = pgSquirrel.Update("farms").SetMap(map[string]interface{}{
 		"updated_at": time.Now(),
 		"deleted_at": time.Now(),
 	}).Where(squirrel.Eq{"id": payload.ID}).ToSql()

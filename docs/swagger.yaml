@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  farms.FarmPayload:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Farm A
+        type: string
+    type: object
   farms.FarmResponse:
     properties:
       id:
@@ -17,12 +26,6 @@ definitions:
         type: array
       meta:
         $ref: '#/definitions/httpres.ListPagination'
-    type: object
-  httpres.BaseResponse:
-    properties:
-      data: {}
-      error:
-        $ref: '#/definitions/httpres.ErrorResponse'
     type: object
   httpres.ErrorResponse:
     properties:
@@ -54,39 +57,147 @@ info:
 paths:
   /farms:
     get:
+      parameters:
+      - description: Keyword to search
+        in: query
+        name: keyword
+        type: string
+      - description: number of entity per page
+        in: query
+        name: limit
+        type: string
+      - description: n-th page
+        in: query
+        name: page
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/httpres.BaseResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/farms.ListFarmResponse'
-                error:
-                  type: string
-              type: object
+            $ref: '#/definitions/farms.ListFarmResponse'
         "404":
           description: Not Found
           schema:
-            allOf:
-            - $ref: '#/definitions/httpres.BaseResponse'
-            - properties:
-                error:
-                  $ref: '#/definitions/httpres.ErrorResponse'
-              type: object
+            $ref: '#/definitions/httpres.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            allOf:
-            - $ref: '#/definitions/httpres.BaseResponse'
-            - properties:
-                error:
-                  $ref: '#/definitions/httpres.ErrorResponse'
-              type: object
+            $ref: '#/definitions/httpres.ErrorResponse'
       summary: get all farm
+      tags:
+      - Farm
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: farm payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/farms.FarmPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "409":
+          description: farm with same name already exists
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: create a new farm
+      tags:
+      - Farm
+  /farms/{farmID}:
+    delete:
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/farms.FarmResponse'
+        "404":
+          description: farm not existed
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: delete specific farm by ID
+      tags:
+      - Farm
+    get:
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/farms.FarmResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: get specific farm by ID
+      tags:
+      - Farm
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: farm payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/farms.FarmPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: farm not existed
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: update farm data
       tags:
       - Farm
   /misc/ping:

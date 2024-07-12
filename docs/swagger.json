@@ -18,62 +18,214 @@
                     "Farm"
                 ],
                 "summary": "get all farm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Keyword to search",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "number of entity per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "n-th page",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/httpres.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/farms.ListFarmResponse"
-                                        },
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/farms.ListFarmResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/httpres.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "$ref": "#/definitions/httpres.ErrorResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/httpres.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/httpres.BaseResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "$ref": "#/definitions/httpres.ErrorResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Farm"
+                ],
+                "summary": "create a new farm",
+                "parameters": [
+                    {
+                        "description": "farm payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/farms.FarmPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "farm with same name already exists",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/farms/{farmID}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Farm"
+                ],
+                "summary": "get specific farm by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/farms.FarmResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Farm"
+                ],
+                "summary": "update farm data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "farm payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/farms.FarmPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "farm not existed",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Farm"
+                ],
+                "summary": "delete specific farm by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/farms.FarmResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "farm not existed",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
                         }
                     }
                 }
@@ -97,6 +249,19 @@
         }
     },
     "definitions": {
+        "farms.FarmPayload": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Farm A"
+                }
+            }
+        },
         "farms.FarmResponse": {
             "type": "object",
             "properties": {
@@ -121,15 +286,6 @@
                 },
                 "meta": {
                     "$ref": "#/definitions/httpres.ListPagination"
-                }
-            }
-        },
-        "httpres.BaseResponse": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "error": {
-                    "$ref": "#/definitions/httpres.ErrorResponse"
                 }
             }
         },

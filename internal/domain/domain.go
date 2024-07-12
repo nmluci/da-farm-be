@@ -18,11 +18,11 @@ func InitDomain(logger zerolog.Logger, db *sqlx.DB, ec *echo.Echo) {
 
 	// initialize root for backend API
 	root := ec.Group("/api/v1",
-		ecMiddleware.CORS(), ecMiddleware.CSRF(),
 		ecMiddleware.RequestIDWithConfig(ecMiddleware.RequestIDConfig{Generator: uuid.NewString}),
 		middleware.RequestBodyLogger(&logger),
 		middleware.RequestLogger(&logger),
 		middleware.HandlerLogger(&logger),
+		ecMiddleware.CORS(),
 	)
 
 	// repository
