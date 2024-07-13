@@ -3,10 +3,13 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/nmluci/da-farm-be/internal/domain/telemetry"
 	"github.com/rs/zerolog"
 )
 
@@ -27,7 +30,7 @@ func HandlerLogger(logger *zerolog.Logger) echo.MiddlewareFunc {
 }
 
 // RequestLogger log every request received by backend
-func RequestLogger(logger *zerolog.Logger) echo.MiddlewareFunc {
+func RequestLogger(logger *zerolog.Logger, telemetrysvc telemetry.RequestMetricService) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			logger.Info().
@@ -41,6 +44,13 @@ func RequestLogger(logger *zerolog.Logger) echo.MiddlewareFunc {
 				Str("route-path", v.RoutePath).
 				Str("user-agent", v.UserAgent).
 				Int("status", v.Status).Msg("request")
+
+			telemetrysvc.StoreRequestLog(c.Request().Context(), &telemetry.RequestMetricPayload{
+				Endpoint:    fmt.Sprintf("%s %s", v.Method, v.RoutePath),
+				Latency:     float64(v.Latency) / float64(time.Millisecond),
+				UserAgent:   v.UserAgent,
+				RequestedAt: v.StartTime,
+			})
 			return nil
 		},
 		LogLatency:   true,

@@ -513,12 +513,37 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "misc"
+                    "Misc"
                 ],
                 "summary": "check server status",
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/telemetry/request-metrics": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Misc"
+                ],
+                "summary": "get request metrics for all registered API",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/telemetry.ListRequestMetricResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -632,6 +657,46 @@ const docTemplate = `{
                 "pond_name": {
                     "type": "string",
                     "example": "Pond A"
+                }
+            }
+        },
+        "telemetry.ListRequestMetricResponse": {
+            "type": "object",
+            "properties": {
+                "request_metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/telemetry.RequestMetric"
+                    }
+                }
+            }
+        },
+        "telemetry.RequestMetric": {
+            "type": "object",
+            "properties": {
+                "avg_latency": {
+                    "type": "number",
+                    "example": 10
+                },
+                "count": {
+                    "type": "integer",
+                    "example": 25
+                },
+                "endpoint": {
+                    "type": "string",
+                    "example": "GET /ponds"
+                },
+                "max_latency": {
+                    "type": "number",
+                    "example": 100
+                },
+                "min_latency": {
+                    "type": "number",
+                    "example": 1
+                },
+                "unique_user_agent": {
+                    "type": "integer",
+                    "example": 5
                 }
             }
         }

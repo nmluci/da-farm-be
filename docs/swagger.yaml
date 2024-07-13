@@ -75,6 +75,34 @@ definitions:
         example: Pond A
         type: string
     type: object
+  telemetry.ListRequestMetricResponse:
+    properties:
+      request_metrics:
+        items:
+          $ref: '#/definitions/telemetry.RequestMetric'
+        type: array
+    type: object
+  telemetry.RequestMetric:
+    properties:
+      avg_latency:
+        example: 10
+        type: number
+      count:
+        example: 25
+        type: integer
+      endpoint:
+        example: GET /ponds
+        type: string
+      max_latency:
+        example: 100
+        type: number
+      min_latency:
+        example: 1
+        type: number
+      unique_user_agent:
+        example: 5
+        type: integer
+    type: object
 info:
   contact: {}
   description: Simple API to manage Farms and Ponds
@@ -414,5 +442,21 @@ paths:
           description: OK
       summary: check server status
       tags:
-      - misc
+      - Misc
+  /telemetry/request-metrics:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/telemetry.ListRequestMetricResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: get request metrics for all registered API
+      tags:
+      - Misc
 swagger: "2.0"

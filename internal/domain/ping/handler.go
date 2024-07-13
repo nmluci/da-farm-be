@@ -14,7 +14,7 @@ type PingHandler func(context.Context) string
 //
 // @Summary check server status
 //
-//	@Tags		misc
+//	@Tags		Misc
 //	@Produce	json
 //	@Success	200
 //	@Router		/misc/ping [get]
