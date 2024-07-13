@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgerrcode"
@@ -211,7 +210,7 @@ func (repo *farmRepository) Upsert(ctx context.Context, payload *FarmType) (err 
 	default:
 		stmt, args, _ = pgSquirrel.Update("farms").SetMap(map[string]interface{}{
 			"name":       payload.Name,
-			"updated_at": time.Now(),
+			"updated_at": squirrel.Expr("NOW()"),
 		}).Where(squirrel.Eq{"id": payload.ID}).ToSql()
 	}
 
@@ -269,8 +268,8 @@ func (repo *farmRepository) Delete(ctx context.Context, payload *farmQuery) (err
 	}
 
 	stmt, args, _ = pgSquirrel.Update("farms").SetMap(map[string]interface{}{
-		"updated_at": time.Now(),
-		"deleted_at": time.Now(),
+		"updated_at": squirrel.Expr("NOW()"),
+		"deleted_at": squirrel.Expr("NOW()"),
 	}).Where(squirrel.Eq{"id": payload.ID}).ToSql()
 
 	_, err = tx.ExecContext(ctx, stmt, args...)

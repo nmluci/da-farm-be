@@ -31,6 +31,9 @@ To run the backend directly on machine instead of using Docker
 4. Run **`go run cmd/server`** to start the backend on local machine
 5. Backend can be accessed on **localhost:7780** (if not changed on step 2) with API Documented in the Swagger
 
+## How to test
+Run `go test ./...` from root directory
+
 ## Configuration 
 | ENV Variable | Value | Default |
 | ------------ | ----- | ------- |

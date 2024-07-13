@@ -3,7 +3,6 @@ package ponds
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
@@ -243,7 +242,7 @@ func (repo *pondRepository) Upsert(ctx context.Context, payload *PondType) (err 
 	default:
 		stmt, args, _ = pgSquirrel.Update("ponds").SetMap(map[string]interface{}{
 			"name":       payload.Name,
-			"updated_at": time.Now(),
+			"updated_at": squirrel.Expr("NOW()"),
 		}).Where(squirrel.And{
 			squirrel.Eq{"id": payload.ID},
 		}).ToSql()
@@ -295,8 +294,8 @@ func (repo *pondRepository) Delete(ctx context.Context, params *pondQuery) (err 
 	}
 
 	stmt, args, _ = pgSquirrel.Update("ponds").SetMap(map[string]interface{}{
-		"updated_at": time.Now(),
-		"deleted_at": time.Now(),
+		"updated_at": squirrel.Expr("NOW()"),
+		"deleted_at": squirrel.Expr("NOW()"),
 	}).Where(squirrel.Eq{"id": params.ID}).ToSql()
 
 	_, err = tx.ExecContext(ctx, stmt, args...)
