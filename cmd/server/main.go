@@ -21,7 +21,7 @@ func main() {
 	config := config.New()
 	logger := logger.New(config)
 
-	docs.SwaggerInfo.Host = config.ServiceAddress
+	docs.SwaggerInfo.Host = config.SwaggerHost
 
 	db, err := postgres.New(logger, config.PostgresConf)
 	if err != nil {

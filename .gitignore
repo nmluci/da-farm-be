@@ -24,3 +24,5 @@ go.work.sum
 *.env
 
 .vscode
+
+data/logs/*.log

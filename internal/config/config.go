@@ -2,6 +2,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -14,6 +15,7 @@ var conf Config
 type Config struct {
 	ServiceName    string
 	ServiceAddress string
+	SwaggerHost    string
 
 	RunSince     time.Time
 	PostgresConf *postgresDB.PostgresConfig
@@ -21,12 +23,13 @@ type Config struct {
 
 func New() *Config {
 	if err := godotenv.Load("config/.env"); err != nil {
-		panic(err)
+		log.Println(".env not found")
 	}
 
 	conf = Config{
 		ServiceName:    os.Getenv("SVC_NAME"),
 		ServiceAddress: os.Getenv("SVC_ADDRESS"),
+		SwaggerHost:    os.Getenv("SWAGGER_HOST"),
 		RunSince:       time.Now(),
 		PostgresConf: &postgresDB.PostgresConfig{
 			Address:  os.Getenv("POSTGRES_ADDRESS"),

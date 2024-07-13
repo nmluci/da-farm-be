@@ -1,0 +1,28 @@
+version: '3.5'
+services:
+  backend:
+    container_name: da-farm-be
+    image: nmluci/da-farm-be:v1.0.0
+    build: .
+    environment:
+      - SVC_NAME=da-farm-be
+      - SVC_ADDRESS=:7780
+      - POSTGRES_ADDRESS=db:5432
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=aqua_db
+      - SWAGGER_HOST=localhost:7780
+    volumes:
+      - ./migrations:/app/migrations
+      - ./data:/app/data
+    ports:
+      - "7780:7780"
+  db:
+    container_name: da-farm-db
+    image: postgres:16.3-alpine
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=aqua_db
+    ports:
+      - "5432:5432"
