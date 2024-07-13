@@ -22,7 +22,7 @@ type FarmResponse struct {
 	Name string `json:"name" example:"Farm A"`
 }
 
-// ListFarmResponse represent domain response for bulk Farm entity
+// ListFarmResponse represent domain response for bulk Farm entities
 type ListFarmResponse struct {
 	Farms []*FarmResponse        `json:"farms"`
 	Meta  httpres.ListPagination `json:"meta"`

@@ -1,6 +1,6 @@
 module github.com/nmluci/da-farm-be
 
-go 1.22.3
+go 1.22.5
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

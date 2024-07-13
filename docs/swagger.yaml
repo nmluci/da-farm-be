@@ -2,9 +2,6 @@ basePath: /api/v1
 definitions:
   farms.FarmPayload:
     properties:
-      id:
-        example: 1
-        type: integer
       name:
         example: Farm A
         type: string
@@ -47,6 +44,36 @@ definitions:
       total_page:
         example: 10
         type: integer
+    type: object
+  ponds.ListPondResponse:
+    properties:
+      meta:
+        $ref: '#/definitions/httpres.ListPagination'
+      ponds:
+        items:
+          $ref: '#/definitions/ponds.PondResponse'
+        type: array
+    type: object
+  ponds.PondPayload:
+    properties:
+      name:
+        example: Pond 1
+        type: string
+    type: object
+  ponds.PondResponse:
+    properties:
+      farm_id:
+        example: 1
+        type: integer
+      farm_name:
+        example: Farm A
+        type: string
+      id:
+        example: 1
+        type: integer
+      pond_name:
+        example: Pond A
+        type: string
     type: object
 info:
   contact: {}
@@ -193,6 +220,10 @@ paths:
           description: farm not existed
           schema:
             $ref: '#/definitions/httpres.ErrorResponse'
+        "409":
+          description: duplicated farm found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -200,6 +231,180 @@ paths:
       summary: update farm data
       tags:
       - Farm
+  /farms/{farmID}/ponds:
+    get:
+      parameters:
+      - description: farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: Keyword to search
+        in: query
+        name: keyword
+        type: string
+      - description: number of entity per page
+        in: query
+        name: limit
+        type: string
+      - description: n-th page
+        in: query
+        name: page
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ponds.ListPondResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: get all pond
+      tags:
+      - Pond
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: pond payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/ponds.PondPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "409":
+          description: pond with same name already exists
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: create a new pond
+      tags:
+      - Pond
+  /farms/{farmID}/ponds/{pondID}:
+    delete:
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: Pond ID
+        in: path
+        name: pondID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ponds.PondResponse'
+        "404":
+          description: pond not existed
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: delete specific pond by ID
+      tags:
+      - Pond
+    get:
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: Pond ID
+        in: path
+        name: pondID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ponds.PondResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: get specific pond by ID
+      tags:
+      - Pond
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Farm ID
+        in: path
+        name: farmID
+        required: true
+        type: integer
+      - description: Pond ID
+        in: path
+        name: pondID
+        required: true
+        type: integer
+      - description: pond payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/ponds.PondPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: pond not existed
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "409":
+          description: duplicated pond found
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.ErrorResponse'
+      summary: update pond data
+      tags:
+      - Pond
   /misc/ping:
     get:
       produces:

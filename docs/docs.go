@@ -191,6 +191,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/httpres.ErrorResponse"
                         }
                     },
+                    "409": {
+                        "description": "duplicated farm found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -238,6 +244,269 @@ const docTemplate = `{
                 }
             }
         },
+        "/farms/{farmID}/ponds": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pond"
+                ],
+                "summary": "get all pond",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Keyword to search",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "number of entity per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "n-th page",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ponds.ListPondResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pond"
+                ],
+                "summary": "create a new pond",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "pond payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ponds.PondPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "pond with same name already exists",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/farms/{farmID}/ponds/{pondID}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pond"
+                ],
+                "summary": "get specific pond by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pond ID",
+                        "name": "pondID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ponds.PondResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pond"
+                ],
+                "summary": "update pond data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pond ID",
+                        "name": "pondID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "pond payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ponds.PondPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "pond not existed",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "duplicated pond found",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pond"
+                ],
+                "summary": "delete specific pond by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Farm ID",
+                        "name": "farmID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Pond ID",
+                        "name": "pondID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ponds.PondResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "pond not existed",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httpres.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/misc/ping": {
             "get": {
                 "produces": [
@@ -259,10 +528,6 @@ const docTemplate = `{
         "farms.FarmPayload": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "name": {
                     "type": "string",
                     "example": "Farm A"
@@ -323,6 +588,50 @@ const docTemplate = `{
                 "total_page": {
                     "type": "integer",
                     "example": 10
+                }
+            }
+        },
+        "ponds.ListPondResponse": {
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "$ref": "#/definitions/httpres.ListPagination"
+                },
+                "ponds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ponds.PondResponse"
+                    }
+                }
+            }
+        },
+        "ponds.PondPayload": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Pond 1"
+                }
+            }
+        },
+        "ponds.PondResponse": {
+            "type": "object",
+            "properties": {
+                "farm_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "farm_name": {
+                    "type": "string",
+                    "example": "Farm A"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "pond_name": {
+                    "type": "string",
+                    "example": "Pond A"
                 }
             }
         }

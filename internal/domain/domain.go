@@ -8,6 +8,7 @@ import (
 	"github.com/nmluci/da-farm-be/internal/core/middleware"
 	"github.com/nmluci/da-farm-be/internal/domain/farms"
 	"github.com/nmluci/da-farm-be/internal/domain/ping"
+	"github.com/nmluci/da-farm-be/internal/domain/ponds"
 	"github.com/rs/zerolog"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -27,13 +28,15 @@ func InitDomain(logger zerolog.Logger, db *sqlx.DB, ec *echo.Echo) {
 
 	// repository
 	farmRepository := farms.NewRepository(db)
+	pondRepository := ponds.NewRepository(db)
 
 	// services
 	pingService := ping.NewService()
 	farmService := farms.NewService(farmRepository)
+	pondService := ponds.NewService(pondRepository)
 
 	// handler
 	ping.NewController(pingService).Route(root)
 	farms.NewController(farmService).Route(root)
-
+	ponds.NewController(pondService).Route(root)
 }
